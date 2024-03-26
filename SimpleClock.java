@@ -92,7 +92,68 @@ public class SimpleClock extends JFrame {
             this.setLocationRelativeTo(null);
             this.setVisible(true);
             this.setSize(350, 310);
+// Time (12/24 hr) format button action event
+        hourFormatButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                try {
+                    hourCounter ++;
+                    if (hourCounter % 2 != 0) // 12 hr clock format condition
+                    {
+                        hourFormatButton.setText("Change to 12 Hr format");
+                        format_12_24_time = new SimpleDateFormat("HH:mm:ss");
+                    }
+                    else // 24 hr clock format condition
+                    {
+                        hourFormatButton.setText("Change to 24 Hr format");
+                        format_12_24_time = new SimpleDateFormat("hh:mm:ss a");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ex.printStackTrace();
+                }
+            }
+        });
 
+        // Timezone (Local/GMT format button action event
+        timeZoneFormatButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                try {
+                    timezoneCounter ++;
+
+                    if (hourCounter % 2 != 0) // 24 hr clock format condition
+                    {
+                        format_12_24_time = new SimpleDateFormat("HH:mm:ss");
+                    }
+                    else // 12 hr clock format condition
+                    {
+                        format_12_24_time = new SimpleDateFormat("hh:mm:ss a");
+                    }
+
+                    if (timezoneCounter % 2 != 0) // local timezone format condition
+                    {
+                        timeZoneFormatButton.setText("Change to GMT timezone");
+                        format_12_24_time.setTimeZone(TimeZone.getTimeZone("GMT"));
+                        format_GMTDay.setTimeZone(TimeZone.getTimeZone("GMT"));
+                        format_GMTDate.setTimeZone(TimeZone.getTimeZone("GMT"));
+                    }
+                    else // GMT timezone format condition
+                    {
+                        timeZoneFormatButton.setText("Change to Local timezone");
+                        format_12_24_time.setTimeZone(TimeZone.getTimeZone(tz.getID()));
+                        format_LocalDay.setTimeZone(TimeZone.getTimeZone(tz.getID()));
+                        format_LocalDate.setTimeZone(TimeZone.getTimeZone(tz.getID()));
+                    }
+                }
+                catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
             setTimer();
         }
     
