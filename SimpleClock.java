@@ -1,7 +1,6 @@
 //package SimpleClock;
 
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,42 +11,26 @@ import java.util.TimeZone;
 
 public class SimpleClock extends JFrame {
     
-        Calendar calendar;
-        SimpleDateFormat timeFormat;
-        SimpleDateFormat dayFormat;
-        SimpleDateFormat dateFormat;
+        JLabel timeLabel, dayLabel, dateLabel;
 
-        JLabel timeLabel;
-        JLabel dayLabel;
-        JLabel dateLabel;
+        // hourFormatButton - button which switches between 12/24 hr format
+        // timeZoneFormatButton - button which switches between local time and GMT
+        JButton hourFormatButton, timeZoneFormatButton;
 
-        // A button which switches between 12/24 hr format
-        JButton hourFormatButton;
-
-        // A button which switches between local time and GMT
-        JButton timeZoneFormatButton;
-
-        String time;
-        String day;
-        String date;
+        String time, day, date;
 
         int hourCounter = 0;
         int timezoneCounter = 0;
 
         Date currentDate;
 
-        SimpleDateFormat format_24Hour;
-        SimpleDateFormat format_12Hour;
+        SimpleDateFormat format_12_24_time, format_LocalDay, format_GMTDay, format_LocalDate, format_GMTDate;
 
-        SimpleDateFormat format_LocalDay;
-        SimpleDateFormat format_GMTDay;
+        TimeZone tz;
 
-        SimpleDateFormat format_LocalDate;
-        SimpleDateFormat format_GMTDate;
-
-        SimpleClock() {
+    SimpleClock() {
             this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            this.setTitle("Digital Clock");
+            this.setTitle("Shaily's Digital Clock");
 
             Container cp = this.getContentPane();
             FlowLayout flow = new FlowLayout();
@@ -56,19 +39,21 @@ public class SimpleClock extends JFrame {
 
             this.setSize(350, 310);
             this.setResizable(false);
-            //this.setLayout(null);
 
-            timeFormat = new SimpleDateFormat("hh:mm:ss a");
-            dayFormat=new SimpleDateFormat("EEEE");
-            dateFormat=new SimpleDateFormat("dd MMMMM, yyyy");
+            tz = Calendar.getInstance().getTimeZone();
+
+            format_12_24_time = new SimpleDateFormat("hh:mm:ss a");
+            format_GMTDay = new SimpleDateFormat("EEEE");
+            format_LocalDay = new SimpleDateFormat("EEEE");
+            format_LocalDate = new SimpleDateFormat("dd MMMMM, yyyy");
+            format_GMTDate = new SimpleDateFormat("dd MMMMM, yyyy");
+
             timeLabel = new JLabel();
             timeLabel.setFont(new Font("SANS_SERIF", Font.PLAIN, 59));
-            int xPosTime = timeLabel.getHorizontalAlignment(); // 10
-            int yPosTime = timeLabel.getVerticalAlignment(); // 10
             timeLabel.setHorizontalAlignment(JLabel.CENTER);
             timeLabel.setVerticalAlignment(JLabel.CENTER);
-            timeLabel.setBackground(Color.BLACK);
-            timeLabel.setForeground(Color.WHITE);
+            timeLabel.setBackground(Color.ORANGE);
+            timeLabel.setForeground(Color.BLACK);
             timeLabel.setOpaque(true);
 
             dayLabel=new JLabel();
@@ -81,26 +66,23 @@ public class SimpleClock extends JFrame {
             dateLabel.setHorizontalAlignment(JLabel.CENTER);
             dateLabel.setVerticalAlignment(JLabel.CENTER);
 
-            hourFormatButton = new JButton("12/24 hr format");
+            hourFormatButton = new JButton("Change to 24 hr format");
             hourFormatButton.setFont(new Font("ITALIC",Font.BOLD,15));
-            hourFormatButton.setPreferredSize(new Dimension(170, 40));
+            hourFormatButton.setPreferredSize(new Dimension(250, 40));
             hourFormatButton.setBackground(Color.CYAN);
             hourFormatButton.setHorizontalAlignment(JLabel.CENTER);
             hourFormatButton.setVerticalAlignment(JLabel.CENTER);
 
-            timeZoneFormatButton = new JButton("local/GMT");
-            timeZoneFormatButton.setPreferredSize(new Dimension(170, 40));
+            timeZoneFormatButton = new JButton("Change to GMT format");
+            timeZoneFormatButton.setPreferredSize(new Dimension(250, 40));
             timeZoneFormatButton.setFont(new Font("ITALIC",Font.BOLD,15));
-            timeZoneFormatButton.setBackground(Color.orange);
+            timeZoneFormatButton.setBackground(Color.MAGENTA);
             timeZoneFormatButton.setHorizontalAlignment(JLabel.CENTER);
             timeZoneFormatButton.setVerticalAlignment(JLabel.CENTER);
 
-
-            hourFormatButton.setLayout(null);
-            timeZoneFormatButton.setLayout(null);
-
             cp.add(timeLabel);
             cp.add(dayLabel);
+
             this.add(dateLabel);
             this.add(hourFormatButton);
             this.add(timeZoneFormatButton);
@@ -111,119 +93,42 @@ public class SimpleClock extends JFrame {
             this.setVisible(true);
             this.setSize(350, 310);
 
-            hourFormatButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e)
-                {
-                    try {
-                        hourCounter ++;
-                        if (hourCounter % 2 != 0) {
-                            format_24Hour = new SimpleDateFormat("HH:mm:ss");
-
-                        }
-                        else {
-                            format_12Hour = new SimpleDateFormat("hh:mm:ss a");
-                        }
-
-                    }
-                    catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                }
-            });
-
-            timeZoneFormatButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e)
-            {
-                try {
-                    timezoneCounter ++;
-
-                    if (timezoneCounter % 2 != 0) {
-
-                        format_LocalDay = new SimpleDateFormat("EEEE");
-                        format_LocalDay.setTimeZone(TimeZone.getTimeZone("EST"));
-
-                        format_LocalDate = new SimpleDateFormat("dd MMMMM, yyyy");
-                        format_LocalDate.setTimeZone(TimeZone.getTimeZone("EST"));
-                    }
-                    else
-                    {
-                        format_GMTDay = new SimpleDateFormat("EEEE");
-                        format_GMTDay.setTimeZone(TimeZone.getTimeZone("GMT"));
-
-                        format_GMTDate = new SimpleDateFormat("dd MMMMM, yyyy");
-                        format_GMTDate.setTimeZone(TimeZone.getTimeZone("GST"));
-                    }
-                }
-                catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-        });
-
             setTimer();
         }
     
         public void setTimer() {
             while (Thread.currentThread().isAlive()) {
-//                time = timeFormat.format(Calendar.getInstance().getTime());
-//                timeLabel.setText(time);
-//
-//                day = dayFormat.format(Calendar.getInstance().getTime());
-//                dayLabel.setText(day);
-//
-//                date = dateFormat.format(Calendar.getInstance().getTime());
-//                dateLabel.setText(date);
-
                 currentDate = new Date(System.currentTimeMillis());
+                time = format_12_24_time.format(currentDate);
 
-                if (hourCounter == 0)
+                if (timezoneCounter % 2 != 0) // local timezone format condition
                 {
-                    time = timeFormat.format(Calendar.getInstance().getTime());
-                }
-                else if (hourCounter % 2 != 0)
-                {
-                    time = format_24Hour.format(currentDate);
-                }
-                else
-                {
-                    time = format_12Hour.format(currentDate);
-                }
-                timeLabel.setText(time);
-
-
-                if (timezoneCounter == 0) {
-                    day = dayFormat.format(Calendar.getInstance().getTime());
-                    date = dateFormat.format(Calendar.getInstance().getTime());
-                }
-                else if (timezoneCounter % 2 != 0) {
                     day = format_LocalDay.format(Calendar.getInstance().getTime());
                     date = format_LocalDate.format(Calendar.getInstance().getTime());
-                    System.out.println("Local Time: " + day + " " + date);
                 }
-                else
+                else // GMT timezone format condition
                 {
                     day = format_GMTDay.format(Calendar.getInstance().getTime());
                     date = format_GMTDate.format(Calendar.getInstance().getTime());
-                    System.out.println("GMT Time: " + day + " " + date);
                 }
 
+                timeLabel.setText(time);
                 dayLabel.setText(day);
                 dateLabel.setText(date);
 
-                try {
-                    Thread.sleep(1000);
-                } catch (Exception e) {
+                try
+                {
+                    Thread.sleep(10);
+                }
+                catch (Exception e)
+                {
                     e.getStackTrace();
                 }
             }
         }
 
-
-
-        public static void main(String[] args) {
+        public static void main(String[] args)
+        {
             new SimpleClock();
         }
     }
